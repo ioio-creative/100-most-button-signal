@@ -26,7 +26,7 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 char server[] = "www.google.com";    // name address for Google (using DNS)
 
 // Set the static IP address to use if the DHCP fails to assign
-IPAddress ip(192, 168, 0, 177);
+IPAddress ip(10, 0, 1, 159);
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server
@@ -40,7 +40,7 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
 
-  Serial.println("Before beginning Ethernet.");
+  //Ethernet.begin(mac, ip);
 
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
@@ -67,8 +67,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Hello, world!");
-  
   // if there are incoming bytes available
   // from the server, read them and print them:
   if (client.available()) {
@@ -86,3 +84,4 @@ void loop() {
     while (true);
   }
 }
+
