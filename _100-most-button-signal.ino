@@ -1,87 +1,145 @@
 /*
-  Web client
-
- This sketch connects to a website (http://www.google.com)
- using an Arduino Wiznet Ethernet shield.
-
- Circuit:
- * Ethernet shield attached to pins 10, 11, 12, 13
-
- created 18 Dec 2009
- by David A. Mellis
- modified 9 Apr 2012
- by Tom Igoe, based on work by Adrian McEwen
-
- */
+   Web client sketch for IDE v1.0.1 and w5100/w5200
+   Uses POST method.
+   Posted November 2012 by SurferTim
+*/
 
 #include <SPI.h>
 #include <Ethernet.h>
 
-// Enter a MAC address for your controller below.
-// Newer Ethernet shields have a MAC address printed on a sticker on the shield
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-// if you don't want to use DNS (and reduce your sketch size)
-// use the numeric IP instead of the name for the server:
-//IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
-char server[] = "www.google.com";    // name address for Google (using DNS)
+byte mac[] = {  
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
-// Set the static IP address to use if the DHCP fails to assign
-IPAddress ip(10, 0, 1, 159);
+//Change to your server domain
+//char serverName[] = "www.mydomain.com";
+char serverName[] = "54.251.190.138";
 
-// Initialize the Ethernet client library
-// with the IP address and port of the server
-// that you want to connect to (port 80 is default for HTTP):
+// change to your server's port
+//int serverPort = 80;
+int serverPort = 8080;
+
+// change to the pathName on that server
+//char pathName[] = "/arduinotest.php";
+char pathName[] = "/api/test";
+
 EthernetClient client;
+int totalCount = 0;
+// insure params is big enough to hold your variables
+char params[32];
+
+// set this to the number of milliseconds delay
+// this is 30 seconds
+#define delayMillis 30000UL
+
+unsigned long thisMillis = 0;
+unsigned long lastMillis = 0;
 
 void setup() {
-  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
+
+  // disable SD SPI
+  pinMode(4,OUTPUT);
+  digitalWrite(4,HIGH);
+
+  Serial.print(F("Starting ethernet..."));
+  if(!Ethernet.begin(mac)) Serial.println(F("failed"));
+  else Serial.println(Ethernet.localIP());
+
+  delay(2000);
+  Serial.println(F("Ready"));
+}
+
+void loop()
+{
+  // If using a static IP, comment out the next line
+  Ethernet.maintain();
+
+//  thisMillis = millis();
+//
+//  if(thisMillis - lastMillis > delayMillis)
+//  {
+//    lastMillis = thisMillis;
+//  }
+
+  sendButtonSignalToServer(getButtonClicked()); 
+}
+
+int getButtonClicked() {
+  int inChar = -1;
+  if (Serial.available() > 0) {
+    inChar = Serial.read();
+    Serial.println(inChar);
   }
+  return inChar;
+}
 
-  //Ethernet.begin(mac, ip);
+int convertAsciiValueToNumberCharacter(int asciiValue) {
+  // 48 = 0 in ASCII
+  return asciiValue - 48;
+}
 
-  // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    // try to congifure using IP address instead of DHCP:
-    Ethernet.begin(mac, ip);
-  }
-  // give the Ethernet shield a second to initialize:
-  delay(1000);
-  Serial.println("connecting...");
-
-  // if you get a connection, report back via serial:
-  if (client.connect(server, 80)) {
-    Serial.println("connected");
-    // Make a HTTP request:
-    client.println("GET /search?q=arduino HTTP/1.1");
-    client.println("Host: www.google.com");
-    client.println("Connection: close");
-    client.println();
-  } else {
-    // if you didn't get a connection to the server:
-    Serial.println("connection failed");
+void sendButtonSignalToServer(int btnClicked) {
+  int btnId = convertAsciiValueToNumberCharacter(btnClicked);
+  if (btnId > 0 && btnId < 8) {  
+    sprintf(params, "{\"btnPressed\": %d}", btnId);
+    if(!postJson(serverName,serverPort,pathName,params)) Serial.print(F("Fail "));
+    else Serial.print(F("Pass "));
+    totalCount++;
+    Serial.println(totalCount,DEC);
   }
 }
 
-void loop() {
-  // if there are incoming bytes available
-  // from the server, read them and print them:
-  if (client.available()) {
-    char c = client.read();
-    Serial.print(c);
+byte postJson(char* domainBuffer,int thisPort,char* path,char* jsonData) {
+  int inChar;
+  char outBuf[64];
+
+  Serial.print(F("connecting..."));
+
+  if(client.connect(domainBuffer,thisPort) == 1)
+  {
+    Serial.println(F("connected"));
+
+    // send the header
+    sprintf(outBuf,"POST %s HTTP/1.1",path);
+    client.println(outBuf);
+    sprintf(outBuf,"Host: %s",domainBuffer);
+    client.println(outBuf);
+    client.println(F("Connection: close\r\nContent-Type: application/json"));
+    sprintf(outBuf,"Content-Length: %u\r\n",strlen(jsonData));
+    client.println(outBuf);
+    
+    // send the body (variables)
+    client.print(jsonData);       
+  }
+  else
+  {
+    Serial.println(F("failed"));
+    return 0;
   }
 
-  // if the server's disconnected, stop the client:
-  if (!client.connected()) {
-    Serial.println();
-    Serial.println("disconnecting.");
-    client.stop();
+  int connectLoop = 0;
 
-    // do nothing forevermore:
-    while (true);
+  while(client.connected())
+  {
+    while(client.available())
+    {
+      inChar = client.read();
+      Serial.write(inChar);
+      connectLoop = 0;
+    }
+
+    delay(1);
+    connectLoop++;
+    if(connectLoop > 10000)
+    {
+      Serial.println();
+      Serial.println(F("Timeout"));
+      client.stop();
+    }
   }
+
+  Serial.println();
+  Serial.println(F("disconnecting."));
+  client.stop();
+  return 1;
 }
-
