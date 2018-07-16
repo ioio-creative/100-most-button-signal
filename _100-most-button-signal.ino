@@ -4,6 +4,14 @@
    Posted November 2012 by SurferTim
 */
 
+/*
+ * Web Client POST method request (Ethernet.h)
+ * https://playground.arduino.cc/Code/WebClient
+ * 
+ * Arduino Ethernet Shield W5100
+ * https://detail.tmall.com/item.htm?spm=a230r.1.14.6.180651137c6SBp&id=38628268194&cm_id=140105335569ed55e27b&abbucket=1
+ */
+
 #include <SPI.h>
 #include <Ethernet.h>
 
