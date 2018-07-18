@@ -32,12 +32,16 @@ String MyButton::getState(bool* isStateChanged) {
   ButtonState btnState;
   if (lastDigitalRead == LOW && currentDigitalRead == LOW) {
     btnState = NotPressed;
+    Serial.println("NotPressed");
   } else if (lastDigitalRead == LOW && currentDigitalRead == HIGH) {
     btnState = Down;
+    Serial.println("Down");
   } else if (lastDigitalRead == HIGH && currentDigitalRead == HIGH) {
     btnState = Pressed;
+    Serial.println("Pressed");
   } else if (lastDigitalRead == HIGH && currentDigitalRead == LOW) {
     btnState = Up;
+    Serial.println("Up");
   }
 
   String stateStr = "";

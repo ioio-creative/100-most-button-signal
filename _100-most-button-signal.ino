@@ -118,7 +118,9 @@ void loop() {
 //    lastMillis = thisMillis;
 //  }
 
-  //sendButtonSignalToServer(getButtonClicked()); 
+  //sendButtonSignalToServer(getButtonClicked());
+
+  sendButtonSignalToServer(buttons);
 }
 
 
@@ -154,6 +156,7 @@ void loop() {
 void sendButtonSignalToServer(MyButton buttons[]) {
   bool isAnyBtnStateChanged;
   sprintf(data, constructJsonData(buttons, &isAnyBtnStateChanged).c_str());
+  Serial.println(isAnyBtnStateChanged);
   if (isAnyBtnStateChanged) {       
     if(!postJson(serverName,serverPort,pathName,data)) Serial.print(F("Fail "));
     else Serial.print(F("Pass "));
