@@ -10,37 +10,82 @@
  * 
  * Arduino Ethernet Shield W5100
  * https://detail.tmall.com/item.htm?spm=a230r.1.14.6.180651137c6SBp&id=38628268194&cm_id=140105335569ed55e27b&abbucket=1
+ * 
+ * Modified by Christopher Wong and Wong Chun Hoi
  */
+
+
+ /* includes */
 
 #include <SPI.h>
 #include <Ethernet.h>
 
-byte mac[] = {  
+#include "MyButton.h"
+#include "MySimpleButtonStruct.h"
+
+/* end of includes */
+
+
+/* networking params */
+
+const byte mac[] = {  
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
 //Change to your server domain
-//char serverName[] = "www.mydomain.com";
-char serverName[] = "54.251.190.138";
+//const char serverName[] = "www.mydomain.com";
+const char serverName[] = "54.251.190.138";
 
 // change to your server's port
-//int serverPort = 80;
-int serverPort = 8080;
+//const int serverPort = 80;
+const int serverPort = 8080;
 
 // change to the pathName on that server
-//char pathName[] = "/arduinotest.php";
-char pathName[] = "/api/test";
+//const char pathName[] = "/arduinotest.php";
+const char pathName[] = "/api/test";
+
+/* end of networking params */
+
+
+/* global variables for networking */
 
 EthernetClient client;
 int totalCount = 0;
-// insure params is big enough to hold your variables
-char params[32];
+// insure data is big enough to hold your variables
+char data[32];
 
-// set this to the number of milliseconds delay
-// this is 30 seconds
-#define delayMillis 30000UL
+/* end of global variables for networking */
 
-unsigned long thisMillis = 0;
-unsigned long lastMillis = 0;
+
+/* button params */
+
+const MySimpleButtonStruct simpleButtonStructs[] = {
+  { MyButton::btnA, "btnA", 2 },
+  { MyButton::btnB, "btnB", 3 },
+  { MyButton::btnC, "btnC", 5 },
+  { MyButton::btnD, "btnD", 6 },
+  { MyButton::btnE, "btnE", 7 },
+  { MyButton::btnF, "btnF", 8 },
+  { MyButton::btnG, "btnG", 9 }
+};
+
+const int NUM_OF_BUTTONS = sizeof(simpleButtonStructs) / sizeof(MySimpleButtonStruct);
+
+MyButton buttons[NUM_OF_BUTTONS];
+
+/* end of button params */
+
+
+/* timer params */
+
+//// set this to the number of milliseconds delay
+//// this is 30 seconds
+//#define delayMillis 30000UL
+//
+//unsigned long thisMillis = 0;
+//unsigned long lastMillis = 0;
+
+/* end of timer params */
+
 
 void setup() {
   Serial.begin(9600);
@@ -55,10 +100,14 @@ void setup() {
 
   delay(2000);
   Serial.println(F("Ready"));
+
+  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
+    MySimpleButtonStruct mySimpleBtn = simpleButtonStructs[i];
+    buttons[i].Initialize(mySimpleBtn.id, mySimpleBtn.btnName, mySimpleBtn.pin); 
+  }
 }
 
-void loop()
-{
+void loop() {
   // If using a static IP, comment out the next line
   Ethernet.maintain();
 
@@ -69,35 +118,64 @@ void loop()
 //    lastMillis = thisMillis;
 //  }
 
-  sendButtonSignalToServer(getButtonClicked()); 
+  //sendButtonSignalToServer(getButtonClicked()); 
 }
 
-int getButtonClicked() {
-  int inChar = -1;
-  if (Serial.available() > 0) {
-    inChar = Serial.read();
-    Serial.println(inChar);
-  }
-  return inChar;
-}
 
-int convertAsciiValueToNumberCharacter(int asciiValue) {
-  // 48 = 0 in ASCII
-  return asciiValue - 48;
-}
+/* testing sendButtonSignalToServer using input from Serial */
 
-void sendButtonSignalToServer(int btnClicked) {
-  int btnId = convertAsciiValueToNumberCharacter(btnClicked);
-  if (btnId > 0 && btnId < 8) {  
-    sprintf(params, "{\"btnPressed\": %d}", btnId);
-    if(!postJson(serverName,serverPort,pathName,params)) Serial.print(F("Fail "));
+//int getButtonClicked() {
+//  int inChar = -1;
+//  if (Serial.available() > 0) {
+//    inChar = Serial.read();
+//    Serial.println(inChar);
+//  }
+//  return convertAsciiValueToNumberCharacter(inChar);
+//}
+//
+//int convertAsciiValueToNumberCharacter(int asciiValue) {
+//  // 48 = 0 in ASCII
+//  return asciiValue - 48;
+//}
+
+//void sendButtonSignalToServer(int btnId) {  
+//  if (btnId > 0 && btnId < 8) {  
+//    sprintf(data, "{\"btnPressed\": %d}", btnId);
+//    if(!postJson(serverName,serverPort,pathName,data)) Serial.print(F("Fail "));
+//    else Serial.print(F("Pass "));
+//    totalCount++;
+//    Serial.println(totalCount,DEC);
+//  }
+//}
+
+/* end of testing sendButtonSignalToServer using input from Serial */
+
+
+void sendButtonSignalToServer(MyButton buttons[]) {
+  bool isAnyBtnStateChanged;
+  sprintf(data, constructJsonData(buttons, &isAnyBtnStateChanged).c_str());
+  if (isAnyBtnStateChanged) {       
+    if(!postJson(serverName,serverPort,pathName,data)) Serial.print(F("Fail "));
     else Serial.print(F("Pass "));
     totalCount++;
-    Serial.println(totalCount,DEC);
+    Serial.println(totalCount, DEC);
   }
 }
 
-byte postJson(char* domainBuffer,int thisPort,char* path,char* jsonData) {
+String constructJsonData(MyButton buttons[], bool* isAnyBtnStateChanged) {
+  *isAnyBtnStateChanged = false;
+  String json = "{";
+  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
+    MyButton myBtn;
+    bool isThisBtnStateChanged = false;
+    json += "\"" + myBtn.getName() + "\":" + myBtn.getState(&isThisBtnStateChanged) + ",";
+    *isAnyBtnStateChanged = *isAnyBtnStateChanged || isThisBtnStateChanged;
+  }
+  json += "}";
+  return json;
+}
+
+byte postJson(char* domainBuffer, int thisPort, char* path, char* jsonData) {
   int inChar;
   char outBuf[64];
 
