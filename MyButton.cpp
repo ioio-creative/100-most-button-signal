@@ -10,7 +10,6 @@
 
 MyButton::MyButton() {  
   lastDigitalRead = LOW;
-  currentDigitalRead = LOW;
 }
 
 /* end of constructors */
@@ -18,31 +17,37 @@ MyButton::MyButton() {
 
 /* public methods */
 
-void MyButton::Initialize(MyButton::ButtonId id, String btnName, int pin) {
-  this->id = id;
-  this->btnName = btnName;
-  this->pin = pin;
+// call Initialize() in setup()
+void MyButton::Initialize(MyButton::ButtonId anId, String aBtnName, int aPin) {
+  id = anId;
+  btnName = aBtnName;
+  pin = aPin;
+
+  // !!! Important !!!
+  pinMode(aPin, INPUT_PULLUP);
 }
 
-String MyButton::getState(bool* isStateChanged) {
-  lastDigitalRead = currentDigitalRead;
-  currentDigitalRead = digitalRead(pin);
+String MyButton::getState(bool* isStateChanged) {  
+  int currentDigitalRead = digitalRead(pin);
   *isStateChanged = lastDigitalRead != currentDigitalRead;
-  
+
+//  if (btnName == "btnG") {
+//    Serial.println(currentDigitalRead);
+//  }
+
+  // !!! Important !!! Somehow the digitalRead is inverted
   ButtonState btnState;
-  if (lastDigitalRead == LOW && currentDigitalRead == LOW) {
+  if (!(lastDigitalRead == LOW && currentDigitalRead == LOW)) {
     btnState = NotPressed;
-    Serial.println("NotPressed");
-  } else if (lastDigitalRead == LOW && currentDigitalRead == HIGH) {
+  } else if (!(lastDigitalRead == LOW && currentDigitalRead == HIGH)) {
     btnState = Down;
-    Serial.println("Down");
-  } else if (lastDigitalRead == HIGH && currentDigitalRead == HIGH) {
-    btnState = Pressed;
-    Serial.println("Pressed");
-  } else if (lastDigitalRead == HIGH && currentDigitalRead == LOW) {
+  } else if (!(lastDigitalRead == HIGH && currentDigitalRead == HIGH)) {
+    btnState = Pressed;    
+  } else if (!(lastDigitalRead == HIGH && currentDigitalRead == LOW)) {
     btnState = Up;
-    Serial.println("Up");
   }
+
+  lastDigitalRead = currentDigitalRead;
 
   String stateStr = "";
   for (int i = 0; i < NUM_OF_BUTTON_STATES; i++) {

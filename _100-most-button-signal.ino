@@ -28,7 +28,9 @@
 
 /* networking params */
 
-const byte mac[] = {  
+//const byte mac[] = {  
+//  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+uint8_t mac[] = {  
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
 //Change to your server domain
@@ -51,7 +53,7 @@ const char pathName[] = "/api/test";
 EthernetClient client;
 int totalCount = 0;
 // insure data is big enough to hold your variables
-char data[32];
+char data[64];
 
 /* end of global variables for networking */
 
@@ -91,8 +93,8 @@ void setup() {
   Serial.begin(9600);
 
   // disable SD SPI
-  pinMode(4,OUTPUT);
-  digitalWrite(4,HIGH);
+  pinMode(4, OUTPUT);
+  digitalWrite(4, HIGH);
 
   Serial.print(F("Starting ethernet..."));
   if(!Ethernet.begin(mac)) Serial.println(F("failed"));
@@ -154,14 +156,16 @@ void loop() {
 
 
 void sendButtonSignalToServer(MyButton buttons[]) {
-  bool isAnyBtnStateChanged;
-  sprintf(data, constructJsonData(buttons, &isAnyBtnStateChanged).c_str());
-  Serial.println(isAnyBtnStateChanged);
-  if (isAnyBtnStateChanged) {       
-    if(!postJson(serverName,serverPort,pathName,data)) Serial.print(F("Fail "));
-    else Serial.print(F("Pass "));
-    totalCount++;
-    Serial.println(totalCount, DEC);
+  bool isAnyBtnStateChanged;  
+  String jsonStr = constructJsonData(buttons, &isAnyBtnStateChanged);
+  
+  if (isAnyBtnStateChanged) {
+    sprintf(data, jsonStr.c_str());
+    Serial.println(data);      
+//    if(!postJson(serverName,serverPort,pathName,data)) Serial.print(F("Fail "));
+//    else Serial.print(F("Pass "));
+//    totalCount++;
+//    Serial.println(totalCount, DEC);
   }
 }
 
@@ -169,16 +173,16 @@ String constructJsonData(MyButton buttons[], bool* isAnyBtnStateChanged) {
   *isAnyBtnStateChanged = false;
   String json = "{";
   for (int i = 0; i < NUM_OF_BUTTONS; i++) {
-    MyButton myBtn;
+    MyButton myBtn = buttons[i];
     bool isThisBtnStateChanged = false;
-    json += "\"" + myBtn.getName() + "\":" + myBtn.getState(&isThisBtnStateChanged) + ",";
+    json += "\"" + String(myBtn.getName()) + "\":" + String(myBtn.getState(&isThisBtnStateChanged)) + ",";
     *isAnyBtnStateChanged = *isAnyBtnStateChanged || isThisBtnStateChanged;
   }
   json += "}";
   return json;
 }
 
-byte postJson(char* domainBuffer, int thisPort, char* path, char* jsonData) {
+byte postJson(const char* domainBuffer, int thisPort, const char* path, const char* jsonData) {
   int inChar;
   char outBuf[64];
 

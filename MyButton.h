@@ -20,15 +20,9 @@ class MyButton
       btnE = 4,
       btnF = 5,
       btnG = 6
-    } ButtonId;   
-    
-    MyButton();  
-    void Initialize(MyButton::ButtonId id, String btnName, int pin);
-    String getState(bool* isStateChanged);
-    String getName();
+    } ButtonId;
 
-  private:
-    typedef enum
+      typedef enum
     {
       NotPressed,
       Down,
@@ -45,19 +39,26 @@ class MyButton
     // !!! Important !!! The number 4 is needed.
     // https://stackoverflow.com/questions/21152171/too-many-initializers-for-int-0-c
     ButtonStateStringPair btnStateStringPairs[4] = {
-      { NotPressed, "NotPressed" },
-      { Down, "Down" },
-      { Pressed, "Pressed" },
-      { Up, "Up" }
+      { NotPressed, "N" },
+      { Down, "D" },
+      { Pressed, "P" },
+      { Up, "U" }
     };
 
     const int NUM_OF_BUTTON_STATES = sizeof(btnStateStringPairs) / sizeof(MyButton::ButtonStateStringPair);
+    
+    MyButton();  
+    void Initialize(MyButton::ButtonId id, String btnName, int pin);
+    String getState(bool* isStateChanged);
+    String getName();
+
+  private:
+    
   
     MyButton::ButtonId id;
     String btnName;
     int pin;
     int lastDigitalRead;
-    int currentDigitalRead;
 };
 
 #endif
