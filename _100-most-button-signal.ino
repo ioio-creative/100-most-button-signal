@@ -21,7 +21,6 @@
 #include <Ethernet.h>
 
 #include "MyButton.h"
-#include "MySimpleButtonStruct.h"
 
 /* end of includes */
 
@@ -61,13 +60,13 @@ char data[64];
 /* button params */
 
 const MySimpleButtonStruct simpleButtonStructs[] = {
-  { MyButton::btnA, "a", 2 },
-  { MyButton::btnB, "b", 3 },
-  { MyButton::btnC, "c", 5 },
-  { MyButton::btnD, "d", 6 },
-  { MyButton::btnE, "e", 7 },
-  { MyButton::btnF, "f", 8 },
-  { MyButton::btnG, "g", 9 }
+  { 1, "a", 2 },
+  { 2, "b", 3 },
+  { 3, "c", 5 },
+  { 4, "d", 6 },
+  { 5, "e", 7 },
+  { 6, "f", 8 },
+  { 7, "g", 9 }
 };
 
 const int NUM_OF_BUTTONS = sizeof(simpleButtonStructs) / sizeof(MySimpleButtonStruct);

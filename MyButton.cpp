@@ -18,7 +18,7 @@ MyButton::MyButton() {
 /* public methods */
 
 // call Initialize() in setup()
-void MyButton::Initialize(MyButton::ButtonId anId, String aBtnName, int aPin) {
+void MyButton::Initialize(int anId, String aBtnName, int aPin) {
   id = anId;
   btnName = aBtnName;
   pin = aPin;

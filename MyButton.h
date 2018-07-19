@@ -7,22 +7,12 @@
 #define MyButton_h
 
 #include "Arduino.h"
+#include "MySimpleButtonStruct.h"
 
 class MyButton
 {
   public:
     typedef enum
-    {
-      btnA = 0,
-      btnB = 1,
-      btnC = 2,
-      btnD = 3,
-      btnE = 4,
-      btnF = 5,
-      btnG = 6
-    } ButtonId;
-
-      typedef enum
     {
       NotPressed,
       Down,
@@ -45,17 +35,17 @@ class MyButton
       { Up, "U" }
     };
 
-    const int NUM_OF_BUTTON_STATES = sizeof(btnStateStringPairs) / sizeof(MyButton::ButtonStateStringPair);
+    const int NUM_OF_BUTTON_STATES = sizeof(btnStateStringPairs) / sizeof(ButtonStateStringPair);
     
     MyButton();  
-    void Initialize(MyButton::ButtonId id, String btnName, int pin);
+    void Initialize(int id, String btnName, int pin);
     String getState(bool* isStateChanged);
     String getName();
 
   private:
     
   
-    MyButton::ButtonId id;
+    int id;
     String btnName;
     int pin;
     int lastDigitalRead;

@@ -6,7 +6,7 @@
 
 struct MySimpleButtonStruct
 {
-  MyButton::ButtonId id;
+  int id;
   String btnName;
   int pin;
 };
