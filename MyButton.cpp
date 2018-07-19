@@ -18,6 +18,11 @@ MyButton::MyButton() {
 /* public methods */
 
 // call Initialize() in setup()
+void MyButton::Initialize(MySimpleButtonStruct simpleBtnStruct) {
+  Initialize(simpleBtnStruct.id, simpleBtnStruct.btnName, simpleBtnStruct.pin);
+}
+
+// call Initialize() in setup()
 void MyButton::Initialize(int anId, String aBtnName, int aPin) {
   id = anId;
   btnName = aBtnName;

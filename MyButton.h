@@ -37,7 +37,8 @@ class MyButton
 
     const int NUM_OF_BUTTON_STATES = sizeof(btnStateStringPairs) / sizeof(ButtonStateStringPair);
     
-    MyButton();  
+    MyButton();
+    void Initialize(MySimpleButtonStruct simpleBtnStruct);
     void Initialize(int id, String btnName, int pin);
     String getName();
     ButtonState getState(bool* isStateChanged);

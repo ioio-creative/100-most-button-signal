@@ -103,8 +103,7 @@ void setup() {
   Serial.println(F("Ready"));
 
   for (int i = 0; i < NUM_OF_BUTTONS; i++) {
-    MySimpleButtonStruct mySimpleBtn = simpleButtonStructs[i];
-    buttons[i].Initialize(mySimpleBtn.id, mySimpleBtn.btnName, mySimpleBtn.pin); 
+    buttons[i].Initialize(simpleButtonStructs[i]); 
   }
 }
 
