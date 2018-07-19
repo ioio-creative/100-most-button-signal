@@ -45,6 +45,9 @@ class MyButton
     String getStateStr(bool* isStateChanged); 
 
   private:
+    const int MY_LOW = 0;
+    const int MY_HIGH = 1;
+  
     int id;
     String btnName;
     int pin;
