@@ -46,13 +46,13 @@ MyButton::ButtonState MyButton::getState(bool* isStateChanged) {
 
   // !!! Important !!! Somehow the digitalRead is inverted
   ButtonState btnState;
-  if (!(lastDigitalRead == LOW && currentDigitalRead == LOW)) {
+  if (lastDigitalRead == LOW && currentDigitalRead == LOW) {
     btnState = NotPressed;
-  } else if (!(lastDigitalRead == LOW && currentDigitalRead == HIGH)) {
+  } else if (lastDigitalRead == LOW && currentDigitalRead == HIGH) {
     btnState = Down;
-  } else if (!(lastDigitalRead == HIGH && currentDigitalRead == HIGH)) {
+  } else if (lastDigitalRead == HIGH && currentDigitalRead == HIGH) {
     btnState = Pressed;    
-  } else if (!(lastDigitalRead == HIGH && currentDigitalRead == LOW)) {
+  } else if (lastDigitalRead == HIGH && currentDigitalRead == LOW) {
     btnState = Up;
   }
 
