@@ -34,6 +34,7 @@ uint8_t mac[] = {
 
 //Change to your server domain
 //const char serverName[] = "www.mydomain.com";
+//const char serverName[] = "localhost";
 const char serverName[] = "54.251.190.138";
 
 // change to your server's port
