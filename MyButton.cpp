@@ -36,7 +36,7 @@ String MyButton::getName() {
   return btnName;
 }
 
-MyButton::ButtonState MyButton::getState(bool* isStateChanged) {  
+MyButton::ButtonState MyButton::getState(bool* isStateChanged) {
   int currentDigitalRead = digitalRead(pin);
   *isStateChanged = lastDigitalRead != currentDigitalRead;
 
@@ -46,13 +46,13 @@ MyButton::ButtonState MyButton::getState(bool* isStateChanged) {
 
   // !!! Important !!! Somehow the digitalRead is inverted
   ButtonState btnState;
-  if (lastDigitalRead == LOW && currentDigitalRead == LOW) {
+  if (lastDigitalRead == MY_LOW && currentDigitalRead == MY_LOW) {
     btnState = NotPressed;
-  } else if (lastDigitalRead == LOW && currentDigitalRead == HIGH) {
+  } else if (lastDigitalRead == MY_LOW && currentDigitalRead == MY_HIGH) {
     btnState = Down;
-  } else if (lastDigitalRead == HIGH && currentDigitalRead == HIGH) {
+  } else if (lastDigitalRead == MY_HIGH && currentDigitalRead == MY_HIGH) {
     btnState = Pressed;    
-  } else if (lastDigitalRead == HIGH && currentDigitalRead == LOW) {
+  } else if (lastDigitalRead == MY_HIGH && currentDigitalRead == MY_LOW) {
     btnState = Up;
   }
 
