@@ -39,16 +39,17 @@ class MyButton
     
     MyButton();  
     void Initialize(int id, String btnName, int pin);
-    String getState(bool* isStateChanged);
     String getName();
+    ButtonState getState(bool* isStateChanged);
+    String getStateStr(bool* isStateChanged); 
 
   private:
-    
-  
     int id;
     String btnName;
     int pin;
     int lastDigitalRead;
+
+    String convertStateToStr(ButtonState state);
 };
 
 #endif

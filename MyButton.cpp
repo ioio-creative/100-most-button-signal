@@ -27,7 +27,11 @@ void MyButton::Initialize(int anId, String aBtnName, int aPin) {
   pinMode(aPin, INPUT_PULLUP);
 }
 
-String MyButton::getState(bool* isStateChanged) {  
+String MyButton::getName() {
+  return btnName;
+}
+
+MyButton::ButtonState MyButton::getState(bool* isStateChanged) {  
   int currentDigitalRead = digitalRead(pin);
   *isStateChanged = lastDigitalRead != currentDigitalRead;
 
@@ -49,24 +53,27 @@ String MyButton::getState(bool* isStateChanged) {
 
   lastDigitalRead = currentDigitalRead;
 
-  String stateStr = "";
-  for (int i = 0; i < NUM_OF_BUTTON_STATES; i++) {
-    ButtonStateStringPair btnStateStringPair = btnStateStringPairs[i];
-    if (btnState == btnStateStringPair.state) {
-      stateStr = btnStateStringPair.string;
-    }
-  }
-  
-  return stateStr;
+  return btnState;
 }
 
-String MyButton::getName() {
-  return btnName;
+String MyButton::getStateStr(bool* isStateChanged) {
+  return convertStateToStr(getState(isStateChanged));
 }
 
 /* end of public methods */
 
 
 /* private methods */
+
+String MyButton::convertStateToStr(ButtonState state) {
+  String stateStr = "";
+  for (int i = 0; i < NUM_OF_BUTTON_STATES; i++) {
+    ButtonStateStringPair btnStateStringPair = btnStateStringPairs[i];
+    if (state == btnStateStringPair.state) {
+      stateStr = btnStateStringPair.string;
+    }
+  } 
+  return stateStr;
+}
 
 /* end of private methods */

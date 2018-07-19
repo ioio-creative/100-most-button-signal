@@ -174,7 +174,7 @@ String constructJsonData(MyButton buttons[], bool* isAnyBtnStateChanged) {
   for (int i = 0; i < NUM_OF_BUTTONS; i++) {
     MyButton myBtn = buttons[i];
     bool isThisBtnStateChanged = false;
-    json += "\"" + String(myBtn.getName()) + "\":" + String(myBtn.getState(&isThisBtnStateChanged)) + ",";
+    json += "\"" + String(myBtn.getName()) + "\":" + String(myBtn.getStateStr(&isThisBtnStateChanged)) + ",";
     *isAnyBtnStateChanged = *isAnyBtnStateChanged || isThisBtnStateChanged;
   }
   json += "}";
