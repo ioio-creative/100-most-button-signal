@@ -32,6 +32,10 @@ void MyButton::Initialize(int anId, String aBtnName, int aPin) {
   pinMode(aPin, INPUT_PULLUP);
 }
 
+int MyButton::getId() {
+  return id;
+}
+
 String MyButton::getName() {
   return btnName;
 }
@@ -40,13 +44,7 @@ void MyButton::myDigitalRead() {
   currentDigitalRead = digitalRead(pin);
 }
 
-MyButton::ButtonState MyButton::getState(bool* isStateChanged) {
-  *isStateChanged = lastDigitalRead != currentDigitalRead;
-
-//  if (btnName == "btnG") {
-//    Serial.println(currentDigitalRead);
-//  }
-
+MyButton::ButtonState MyButton::getState() {
   // !!! Important !!! Somehow the digitalRead is inverted
   ButtonState btnState;
   if (lastDigitalRead == MY_LOW && currentDigitalRead == MY_LOW) {
@@ -64,8 +62,8 @@ MyButton::ButtonState MyButton::getState(bool* isStateChanged) {
   return btnState;
 }
 
-String MyButton::getStateStr(bool* isStateChanged) {
-  return convertStateToStr(getState(isStateChanged));
+String MyButton::getStateStr() {
+  return convertStateToStr(getState());
 }
 
 void MyButton::updateLastDigitalRead() {

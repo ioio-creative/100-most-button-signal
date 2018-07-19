@@ -181,28 +181,52 @@ void buttonsUpdateLastDigitalRead(MyButton buttons[]) {
 }
 
 void sendButtonSignalToServer(MyButton buttons[]) {
-  bool isAnyBtnStateChanged;  
-  String jsonStr = constructJsonData(buttons, &isAnyBtnStateChanged);
-  sprintf(data, jsonStr.c_str());
-  Serial.println(data);
+  String jsonStr;
+  
+//  jsonStr = constructAllButtonsJsonData(buttons);
+//  Serial.println(jsonStr);
+
+  bool doesDownButtonExist = false;
+  jsonStr = constructDownButtonsJsonData(buttons, &doesDownButtonExist);
+//  sprintf(data, jsonStr.c_str());
+//  Serial.println(data);
     
-  if (isAnyBtnStateChanged) {
-    //sprintf(data, jsonStr.c_str());    
-//    if(!postJson(serverName,serverPort,pathName,data)) Serial.print(F("Fail "));
-//    else Serial.print(F("Pass "));
-//    totalCount++;
-//    Serial.println(totalCount, DEC);
+  if (doesDownButtonExist) {
+      sprintf(data, jsonStr.c_str());
+      Serial.println(data);   
+    if (!postJson(serverName, serverPort, pathName, data)) {
+      Serial.print(F("Fail "));
+    } else {
+      Serial.print(F("Pass "));
+    }
+    totalCount++;
+    Serial.println(totalCount, DEC);
   }
 }
 
-String constructJsonData(MyButton buttons[], bool* isAnyBtnStateChanged) {
-  *isAnyBtnStateChanged = false;
+String constructDownButtonsJsonData(MyButton buttons[], bool* doesDownButtonExist) {
+  String delimiter = ",";
+  String json = "{\"down\":[";
+  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
+    MyButton myBtn = buttons[i];
+    if (myBtn.getState() == MyButton::Down) {
+      json += String(myBtn.getId()) + delimiter;
+      *doesDownButtonExist = true;
+    }
+  }
+  // remove trailing delimiter
+  if (json.indexOf(delimiter) > 0) {
+    json.remove(json.length() - delimiter.length());
+  }
+  json += "]}";
+  return json;
+}
+
+String constructAllButtonsJsonData(MyButton buttons[]) {
   String json = "{";
   for (int i = 0; i < NUM_OF_BUTTONS; i++) {
     MyButton myBtn = buttons[i];
-    bool isThisBtnStateChanged = false;
-    json += "\"" + String(myBtn.getName()) + "\":" + String(myBtn.getStateStr(&isThisBtnStateChanged)) + ",";
-    *isAnyBtnStateChanged = *isAnyBtnStateChanged || isThisBtnStateChanged;
+    json += "\"" + myBtn.getName() + "\":" + myBtn.getStateStr() + ",";
   }
   json += "}";
   return json;

@@ -40,15 +40,22 @@ class MyButton
     MyButton();
     void Initialize(MySimpleButtonStruct simpleBtnStruct);
     void Initialize(int id, String btnName, int pin);
+    int getId();
     String getName();
     void myDigitalRead();
-    ButtonState getState(bool* isStateChanged);
-    String getStateStr(bool* isStateChanged);
+    ButtonState getState();
+    String getStateStr();
     void updateLastDigitalRead();
 
   private:
-    const int MY_LOW = 1;
-    const int MY_HIGH = 0;
+    /*
+     * Somehow, the following would "upset" Arduino
+     * const int MY_LOW = HIGH;
+     * const int MY_HIGH = LOW;
+     * So use 0 and 1 instead;
+     */
+    const int MY_LOW = 1;  // flipped
+    const int MY_HIGH = 0;  // flipped
   
     int id;
     String btnName;
