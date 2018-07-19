@@ -41,8 +41,10 @@ class MyButton
     void Initialize(MySimpleButtonStruct simpleBtnStruct);
     void Initialize(int id, String btnName, int pin);
     String getName();
+    void myDigitalRead();
     ButtonState getState(bool* isStateChanged);
-    String getStateStr(bool* isStateChanged); 
+    String getStateStr(bool* isStateChanged);
+    void updateLastDigitalRead();
 
   private:
     const int MY_LOW = 1;
@@ -52,6 +54,7 @@ class MyButton
     String btnName;
     int pin;
     int lastDigitalRead;
+    int currentDigitalRead;
 
     String convertStateToStr(ButtonState state);
 };

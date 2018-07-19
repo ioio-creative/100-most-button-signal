@@ -9,7 +9,7 @@
 /* constructors */
 
 MyButton::MyButton() {  
-  lastDigitalRead = LOW;
+  lastDigitalRead = MY_LOW;
 }
 
 /* end of constructors */
@@ -36,8 +36,11 @@ String MyButton::getName() {
   return btnName;
 }
 
+void MyButton::myDigitalRead() {
+  currentDigitalRead = digitalRead(pin);
+}
+
 MyButton::ButtonState MyButton::getState(bool* isStateChanged) {
-  int currentDigitalRead = digitalRead(pin);
   *isStateChanged = lastDigitalRead != currentDigitalRead;
 
 //  if (btnName == "btnG") {
@@ -63,6 +66,10 @@ MyButton::ButtonState MyButton::getState(bool* isStateChanged) {
 
 String MyButton::getStateStr(bool* isStateChanged) {
   return convertStateToStr(getState(isStateChanged));
+}
+
+void MyButton::updateLastDigitalRead() {
+  lastDigitalRead = currentDigitalRead;
 }
 
 /* end of public methods */

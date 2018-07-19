@@ -120,7 +120,9 @@ void loop() {
 
   //sendButtonSignalToServer(getButtonClicked());
 
-  sendButtonSignalToServer(buttons);
+  //sendButtonSignalToServer(buttons);
+
+  getAndSendButtonStates(buttons);
 }
 
 
@@ -153,13 +155,39 @@ void loop() {
 /* end of testing sendButtonSignalToServer using input from Serial */
 
 
+void getAndSendButtonStates(MyButton buttons[]) {
+  buttonsDigitalRead(buttons);
+
+  sendButtonSignalToServer(buttons);
+  
+  buttonsUpdateLastDigitalRead(buttons);
+}
+
+
+void buttonsDigitalRead(MyButton buttons[]) {
+  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
+    buttons[i].myDigitalRead();
+//    if (buttons[i].getName() == "g") {
+//      bool dummy;
+//      Serial.println(buttons[i].getStateStr(&dummy));
+//    }
+  }
+}
+
+void buttonsUpdateLastDigitalRead(MyButton buttons[]) {
+  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
+    buttons[i].updateLastDigitalRead();
+  }
+}
+
 void sendButtonSignalToServer(MyButton buttons[]) {
   bool isAnyBtnStateChanged;  
   String jsonStr = constructJsonData(buttons, &isAnyBtnStateChanged);
-  
+  sprintf(data, jsonStr.c_str());
+  Serial.println(data);
+    
   if (isAnyBtnStateChanged) {
-    sprintf(data, jsonStr.c_str());
-    Serial.println(data);      
+    //sprintf(data, jsonStr.c_str());    
 //    if(!postJson(serverName,serverPort,pathName,data)) Serial.print(F("Fail "));
 //    else Serial.print(F("Pass "));
 //    totalCount++;
