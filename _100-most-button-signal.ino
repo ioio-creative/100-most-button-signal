@@ -61,13 +61,13 @@ char data[64];
 /* button params */
 
 const MySimpleButtonStruct simpleButtonStructs[] = {
-  { MyButton::btnA, "btnA", 2 },
-  { MyButton::btnB, "btnB", 3 },
-  { MyButton::btnC, "btnC", 5 },
-  { MyButton::btnD, "btnD", 6 },
-  { MyButton::btnE, "btnE", 7 },
-  { MyButton::btnF, "btnF", 8 },
-  { MyButton::btnG, "btnG", 9 }
+  { MyButton::btnA, "a", 2 },
+  { MyButton::btnB, "b", 3 },
+  { MyButton::btnC, "c", 5 },
+  { MyButton::btnD, "d", 6 },
+  { MyButton::btnE, "e", 7 },
+  { MyButton::btnF, "f", 8 },
+  { MyButton::btnG, "g", 9 }
 };
 
 const int NUM_OF_BUTTONS = sizeof(simpleButtonStructs) / sizeof(MySimpleButtonStruct);
