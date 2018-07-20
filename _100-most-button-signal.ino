@@ -164,10 +164,7 @@ void loop() {
 
 void getAndSendButtonStates(MyButton buttons[]) {
   buttonsDigitalRead(buttons);
-
   sendButtonSignalToServer(buttons);
-  
-  buttonsUpdateLastDigitalRead(buttons);
 }
 
 
@@ -178,12 +175,6 @@ void buttonsDigitalRead(MyButton buttons[]) {
 //      bool dummy;
 //      Serial.println(buttons[i].getStateStr(&dummy));
 //    }
-  }
-}
-
-void buttonsUpdateLastDigitalRead(MyButton buttons[]) {
-  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
-    buttons[i].updateLastDigitalRead();
   }
 }
 
