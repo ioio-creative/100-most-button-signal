@@ -44,8 +44,7 @@ class MyButton
     String getName();
     void myDigitalRead();
     ButtonState getState();
-    String getStateStr();
-    void updateLastDigitalRead();
+    String getStateStr();    
 
   private:
     /*

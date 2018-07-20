@@ -10,6 +10,7 @@
 
 MyButton::MyButton() {  
   lastDigitalRead = MY_LOW;
+  currentDigitalRead = MY_LOW;
 }
 
 /* end of constructors */
@@ -41,6 +42,7 @@ String MyButton::getName() {
 }
 
 void MyButton::myDigitalRead() {
+  lastDigitalRead = currentDigitalRead;
   currentDigitalRead = digitalRead(pin);
 }
 
@@ -64,10 +66,6 @@ MyButton::ButtonState MyButton::getState() {
 
 String MyButton::getStateStr() {
   return convertStateToStr(getState());
-}
-
-void MyButton::updateLastDigitalRead() {
-  lastDigitalRead = currentDigitalRead;
 }
 
 /* end of public methods */
