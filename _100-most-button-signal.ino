@@ -35,15 +35,16 @@ uint8_t mac[] = {
 //Change to your server domain
 //const char serverName[] = "www.mydomain.com";
 //const char serverName[] = "localhost";
-const char serverName[] = "54.251.190.138";
+//const char serverName[] = "54.251.190.138";
+const char serverName[] = "172.20.0.11";
 
 // change to your server's port
-//const int serverPort = 80;
-const int serverPort = 8080;
+//const int serverPort = 8080;
+const int serverPort = 80;
 
 // change to the pathName on that server
-//const char pathName[] = "/arduinotest.php";
-const char pathName[] = "/api/test";
+//const char pathName[] = "/api/test";
+const char pathName[] = "/print.php";
 
 /* end of networking params */
 
@@ -97,8 +98,13 @@ void setup() {
   digitalWrite(4, HIGH);
 
   Serial.print(F("Starting ethernet..."));
-  if(!Ethernet.begin(mac)) Serial.println(F("failed"));
-  else Serial.println(Ethernet.localIP());
+
+//  if(!Ethernet.begin(mac)) Serial.println(F("failed"));
+//  else Serial.println(Ethernet.localIP());
+
+  // specify ip if dhcp not available
+  IPAddress myIp(172, 20, 0, 12);
+  Ethernet.begin(mac, myIp);
 
   delay(2000);
   Serial.println(F("Ready"));
