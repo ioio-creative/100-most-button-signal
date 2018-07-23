@@ -46,6 +46,8 @@ const int serverPort = 80;
 //const char pathName[] = "/api/test";
 const char pathName[] = "/print.php";
 
+const int delayInMillisAfterEveryDown = 10000;
+
 /* end of networking params */
 
 
@@ -130,6 +132,24 @@ void loop() {
   //sendButtonSignalToServer(buttons);
 
   getAndSendButtonStates(buttons);
+
+  // check if any button is down
+  bool isContainDown = false;
+  for (int i = 0; i < NUM_OF_BUTTONS; i++)
+  {
+    if (buttons[i].getState() == MyButton::Down)
+    {
+      isContainDown = true;
+      break;
+    }
+  }
+
+  // if there is a button down
+  // disable further button press for a time interval
+  if (isContainDown)
+  {
+    delay(delayInMillisAfterEveryDown);
+  }
 }
 
 
