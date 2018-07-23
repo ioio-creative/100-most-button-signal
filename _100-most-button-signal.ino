@@ -46,7 +46,7 @@ const int serverPort = 80;
 //const char pathName[] = "/api/test";
 const char pathName[] = "/print.php";
 
-const int delayInMillisAfterEveryDown = 10000;
+const int delayInMillisAfterEveryDown = 5000;
 
 /* end of networking params */
 
@@ -111,9 +111,7 @@ void setup() {
   delay(2000);
   Serial.println(F("Ready"));
 
-  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
-    buttons[i].Initialize(simpleButtonStructs[i]); 
-  }
+  initializeButtons(buttons);
 }
 
 void loop() {
@@ -131,22 +129,12 @@ void loop() {
 
   //sendButtonSignalToServer(buttons);
 
-  getAndSendButtonStates(buttons);
-
-  // check if any button is down
-  bool isContainDown = false;
-  for (int i = 0; i < NUM_OF_BUTTONS; i++)
-  {
-    if (buttons[i].getState() == MyButton::Down)
-    {
-      isContainDown = true;
-      break;
-    }
-  }
+  bool isAnyButtonDown = false;
+  getAndSendButtonStates(buttons, &isAnyButtonDown);
 
   // if there is a button down
   // disable further button press for a time interval
-  if (isContainDown)
+  if (isAnyButtonDown)
   {
     delay(delayInMillisAfterEveryDown);
   }
@@ -182,11 +170,16 @@ void loop() {
 /* end of testing sendButtonSignalToServer using input from Serial */
 
 
-void getAndSendButtonStates(MyButton buttons[]) {
-  buttonsDigitalRead(buttons);
-  sendButtonSignalToServer(buttons);
+void initializeButtons(MyButton buttons[]) {
+  for (int i = 0; i < NUM_OF_BUTTONS; i++) {
+    buttons[i].Initialize(simpleButtonStructs[i]); 
+  }
 }
 
+void getAndSendButtonStates(MyButton buttons[], bool* isAnyButtonDown) {
+  buttonsDigitalRead(buttons);
+  sendButtonSignalToServer(buttons, isAnyButtonDown);
+}
 
 void buttonsDigitalRead(MyButton buttons[]) {
   for (int i = 0; i < NUM_OF_BUTTONS; i++) {
@@ -198,18 +191,17 @@ void buttonsDigitalRead(MyButton buttons[]) {
   }
 }
 
-void sendButtonSignalToServer(MyButton buttons[]) {
+void sendButtonSignalToServer(MyButton buttons[], bool* isAnyButtonDown) {
   String jsonStr;
   
 //  jsonStr = constructAllButtonsJsonData(buttons);
 //  Serial.println(jsonStr);
-
-  bool doesDownButtonExist = false;
-  jsonStr = constructDownButtonsJsonData(buttons, &doesDownButtonExist);
+  
+  jsonStr = constructDownButtonsJsonData(buttons, isAnyButtonDown);
 //  sprintf(data, jsonStr.c_str());
 //  Serial.println(data);
     
-  if (doesDownButtonExist) {
+  if (*isAnyButtonDown) {
       sprintf(data, jsonStr.c_str());
       Serial.println(data);   
     if (!postJson(serverName, serverPort, pathName, data)) {
@@ -222,14 +214,14 @@ void sendButtonSignalToServer(MyButton buttons[]) {
   }
 }
 
-String constructDownButtonsJsonData(MyButton buttons[], bool* doesDownButtonExist) {
+String constructDownButtonsJsonData(MyButton buttons[], bool* isAnyButtonDown) {
   String delimiter = ",";
   String json = "{\"down\":[";
   for (int i = 0; i < NUM_OF_BUTTONS; i++) {
     MyButton myBtn = buttons[i];
     if (myBtn.getState() == MyButton::Down) {
       json += String(myBtn.getId()) + delimiter;
-      *doesDownButtonExist = true;
+      *isAnyButtonDown = true;
     }
   }
   // remove trailing delimiter
